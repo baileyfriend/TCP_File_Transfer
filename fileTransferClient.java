@@ -51,15 +51,10 @@ class fileTransferClient{
       public static void main(String args[]){
       	fileTransferClient ftc = new fileTransferClient();
       	try{
+
       	    //get input
       	    Console cons = System.console();
-      	    String exitStr = cons.readLine("Would you like to transfer new file or exit? (type: newfile or exit): ");
 
-      	    if(exitStr.trim().equals("exit") ){
-      		System.exit(0);
-      	    } else if(!exitStr.equals("newfile") ){
-      		System.out.println("You typed invalid input: " + exitStr + " - continuing on to connect to server");
-      	    }
 
       	    String ipStr = "127.0.0.1"; // Default ip address
       	    boolean valid = false;
@@ -100,8 +95,16 @@ class fileTransferClient{
 		        	}
 			}
 			System.out.println("Now using port number "+portInt); //end of checking port number
+      while(true){
+        
+          String exitStr = cons.readLine("Would you like to transfer new file or exit? (type: newfile or exit): ");
+          if(exitStr.trim().equals("exit") ){
+              System.exit(0);
+          } else if(!exitStr.equals("newfile") ){
+              System.out.println("You typed invalid input: " + exitStr + " - continuing on to connect to server");
+          }
 
-                  
+
           		InetSocketAddress insa = new InetSocketAddress(ipStr, portInt);
           		SocketChannel sc = SocketChannel.open();
           		sc.connect(insa);
@@ -115,19 +118,19 @@ class fileTransferClient{
           		//TODO: This size reading is not working correctly with the server
           		//For the looping, Should we read in the size of all the files together then work with that as a whole, or one at a time?
 
-          		ByteBuffer sizebuffer = ByteBuffer.allocate(100); // should be 16?
-          		sc.read(sizebuffer); //reading the soccet channel
-          		long fileSizeLeastSig =  sizebuffer.getLong();
-          		long fileSizeMostSig =  sizebuffer.getLong();
-          		System.out.println(fileSizeLeastSig);
-          		System.out.println(fileSizeMostSig);
+          		// ByteBuffer sizebuffer = ByteBuffer.allocate(100); // should be 16?
+          		// sc.read(sizebuffer); //reading the soccet channel
+          		// long fileSizeLeastSig =  sizebuffer.getLong();
+          		// long fileSizeMostSig =  sizebuffer.getLong();
+          		// System.out.println(fileSizeLeastSig);
+          		// System.out.println(fileSizeMostSig);
 
           		//loop here - loop until end of file size
 
               // String outfname = Paths.get("").toString() + fname;
               // System.out.println(outfname);
           		File newfile = new File(fname); //make an empty file with that file name
-          		ByteBuffer buffer = ByteBuffer.allocate(Integer.MAX_VALUE);
+          		ByteBuffer buffer = ByteBuffer.allocate(100000);
           		int bytesRead = sc.read(buffer);
           		FileOutputStream outstream =new FileOutputStream(newfile);
           		FileChannel fc = outstream.getChannel();
@@ -146,6 +149,7 @@ class fileTransferClient{
           		System.out.println(message);
 		//should not close the soccet channel until we know the client doesn't want anymore files
           		sc.close();
+            }
       	}catch(IOException e){
       	    System.out.println("Got an exception: " + e);
       	}
