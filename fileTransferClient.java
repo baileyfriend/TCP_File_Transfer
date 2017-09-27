@@ -76,6 +76,7 @@ class fileTransferClient{
 
 
       	    String portStr = cons.readLine("Enter target port number: ");
+	/*Validating the port number*/
                   Boolean portNotValid = false; //checking to see if the port is valid
 		      int portInt=9876; //declaring portInt so the code works
 		      if(portStr.matches("^[0-9]*$")){
@@ -104,7 +105,9 @@ class fileTransferClient{
           		InetSocketAddress insa = new InetSocketAddress(ipStr, portInt);
           		SocketChannel sc = SocketChannel.open();
           		sc.connect(insa);
-          		//@TODO: A list of files being read in, using a while loop with the SIZE of the file sent by the server to exit the loop?
+          		//@TODO:while loop starts here (below is just rought 'outline' code)
+		// Boolean exit = false;
+		//while(false) ----- do the reading in of a file knowing when to stop reading bt having the size
           		String fname = cons.readLine("Enter file to transfer: ");
           		ByteBuffer buf = ByteBuffer.wrap(fname.getBytes()); // must send all messages as ByteBuffer
           		sc.write(buf); // write to the buffer the file name
@@ -141,6 +144,7 @@ class fileTransferClient{
           		sc.read(buf); //reading the soccet channel for an error message or a good message
           		String message = new String(buf.array());
           		System.out.println(message);
+		//should not close the soccet channel until we know the client doesn't want anymore files
           		sc.close();
       	}catch(IOException e){
       	    System.out.println("Got an exception: " + e);
