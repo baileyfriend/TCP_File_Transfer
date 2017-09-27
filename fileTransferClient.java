@@ -76,14 +76,38 @@ class fileTransferClient{
 
 
       	    String portStr = cons.readLine("Enter target port number: ");
-      	    int portInt = Integer.parseInt(portStr);
+	/*Validating the port number*/
+                  Boolean portNotValid = false; //checking to see if the port is valid
+		      int portInt=9876; //declaring portInt so the code works
+		      if(portStr.matches("^[0-9]*$")){
+		            portInt = Integer.parseInt(portStr);
+		            if(portInt<1024 || 49151<portInt){
+					portNotValid = true;
+				}
+		        }else{
+		        	portNotValid = true;
+		        }
+			while(portNotValid){
+				System.out.println("INVALID PORT NUMBER!");
+				portStr = cons.readLine("Enter port number to listen on: ");
+				if(portStr.matches("^[0-9]*$")){
+		        	portInt = Integer.parseInt(portStr);
+		        	if(1024<portInt && portInt<49151){
+						portNotValid = false;
+				}
+		       	}else{
+		        		portNotValid = true;
+		        	}
+			}
+			System.out.println("Now using port number "+portInt); //end of checking port number
 
-      	    //@TODO: Valid IP address? I was going to hard code it to be 127.1.0.0 but????
-      	    if(1024<=portInt && portInt<=49151){
+                  
           		InetSocketAddress insa = new InetSocketAddress(ipStr, portInt);
           		SocketChannel sc = SocketChannel.open();
           		sc.connect(insa);
-          		//@TODO: A list of files being read in, using a while loop with the SIZE of the file sent by the server to exit the loop?
+          		//@TODO:while loop starts here (below is just rought 'outline' code)
+		// Boolean exit = false;
+		//while(false) ----- do the reading in of a file knowing when to stop reading bt having the size
           		String fname = cons.readLine("Enter file to transfer: ");
           		ByteBuffer buf = ByteBuffer.wrap(fname.getBytes()); // must send all messages as ByteBuffer
           		sc.write(buf); // write to the buffer the file name
@@ -120,11 +144,8 @@ class fileTransferClient{
           		sc.read(buf); //reading the soccet channel for an error message or a good message
           		String message = new String(buf.array());
           		System.out.println(message);
+		//should not close the soccet channel until we know the client doesn't want anymore files
           		sc.close();
-
-      	    }else{
-      		System.out.println("You entered an invalid ip address or port number.");
-      	    }
       	}catch(IOException e){
       	    System.out.println("Got an exception: " + e);
       	}

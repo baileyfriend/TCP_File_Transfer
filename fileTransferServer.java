@@ -17,12 +17,40 @@ class fileTransferServer{
 
     public static void main(String args[]){
       fileTransferServer fts = new fileTransferServer();
-	     try{
+	try{
+		System.out.println("Below is a list of available files: ");
+		File curDir = new File(".");
+		File[] filesList = curDir.listFiles();
+        	for(File f : filesList){
+            		if(f.isFile()){
+            	    		System.out.println("\t"+f.getName());
+            		}
+        	}
             Console cons = System.console();
+		Boolean portNotValid = false;
             String portStr = cons.readLine("Enter port number to listen on: ");
-            int portInt = Integer.parseInt(portStr);
-	    if(1024<portInt && portInt<49151){ //error checking to make sure port number is valid
-		//@TODO: make it so the user has an opportunity to choose a new port number with while loop
+            int portInt = 9876;
+	    if(portStr.matches("^[0-9]*$")){
+            	 portInt = Integer.parseInt(portStr);
+            	if(portInt<1024 || 49151<portInt){
+			portNotValid = true;
+		}
+            }else{
+            	portNotValid = true;
+            }
+		while(portNotValid){
+			System.out.println("INVALID PORT NUMBER!");
+			portStr = cons.readLine("Enter port number to listen on: ");
+			if(portStr.matches("^[0-9]*$")){
+            			portInt = Integer.parseInt(portStr);
+            			if(1024<portInt && portInt<49151){
+						portNotValid = false;
+				}
+            		}else{
+            			portNotValid = true;
+            		}
+		}
+		System.out.println("Now using port number "+portInt);
             	ServerSocketChannel c = ServerSocketChannel.open();	//Open ServerSocketChannel
             	c.bind(new InetSocketAddress(portInt));
             	while(true){
@@ -34,9 +62,6 @@ class fileTransferServer{
 		    t.start();
 		    /*All code moved into the server thread class*/
 		}
-	    }else{
-		System.out.println("Port number is invalid.");
-	    }
 	}catch(IOException e){
             System.out.println("Got an IO exception");
         }
